@@ -1,0 +1,40 @@
+/* 7 · Team — more generous grid, larger names, roles in black; portraits unchanged.
+   Active while design.team is true (src/data/design.ts). */
+html.d-team {
+  /* Only the column gap: the cards share subgrid rows, so a row gap would open up the
+     space between name, role and toggle inside each card. */
+  .team-grid {
+    column-gap: 40px;
+  }
+  .team-info {
+    padding-top: 22px;
+  }
+  .team-role {
+    color: var(--foreground);
+    margin-top: 10px;
+  }
+  .team-section + .team-section {
+    border-top: 1px solid var(--border);
+  }
+  /* Portraits as on the original site: each portrait fills its column, and name, role and
+     biography run exactly as wide as the portrait.
+     - phones (up to 559 px): one column, full width;
+     - 560 px up to tablets: two columns side by side, so a portrait never fills a whole
+       tablet screen;
+     - desktop: three columns. */
+  .team-person .portrait-placeholder {
+    width: 100%;
+    max-width: none;
+  }
+  /* Never larger than on the original site's desktop view (379 px): portrait and text
+     grow with the screen up to this width and then stay put. */
+  .team-person {
+    max-width: 379px;
+  }
+  @media (min-width: 560px) and (max-width: 767px) {
+    .team-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 28px;
+    }
+  }
+}

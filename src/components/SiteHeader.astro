@@ -1,0 +1,99 @@
+---
+import Icon from './Icon.astro';
+import { content, type Language } from '../data/site-content';
+import { languagePages, navigationPages, type SitePage, type LegalPage } from '../lib/site-routes';
+import { headerLogo } from '../lib/brand-logo';
+import { buttonClass } from '../lib/button';
+
+interface Props {
+  language: Language;
+  /** Current content page (for nav highlighting and the language switch target). */
+  page?: SitePage;
+  /** Set on legal pages: the language switch toggles the text in place instead of navigating. */
+  legal?: LegalPage;
+}
+const { language, page, legal } = Astro.props;
+const t = content[language];
+const en = language === 'en';
+const menuId = `mobile-nav-${language}`;
+
+function switchHref(locale: Language) {
+  if (legal) return locale === 'en' ? '#english' : '#deutsch';
+  return languagePages[locale][page ?? 'home'];
+}
+---
+
+<header class="site-header">
+  <div class="site-container header-inner">
+    <a href={languagePages[language].home} aria-label="Ocean Capital Partners" class="brand-placeholder">
+      <img
+        class="brand-logo"
+        src={headerLogo.src}
+        srcset={headerLogo.srcset}
+        sizes={headerLogo.sizes}
+        alt="Ocean Capital Partners"
+        width={headerLogo.width}
+        height={headerLogo.height}
+        fetchpriority="high"
+        decoding="async"
+      />
+      <span class="brand-copy">OCEAN CAPITAL<br />PARTNERS</span>
+    </a>
+    <nav class="desktop-nav" aria-label={en ? 'Main navigation' : 'Hauptnavigation'}>
+      {
+        navigationPages.map((target, index) => (
+          <a
+            href={languagePages[language][target]}
+            class:list={[{ 'nav-active': target === page }]}
+            aria-current={target === page ? 'page' : undefined}
+          >
+            {t.nav[index]}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="header-controls">
+      <div class="language-switch" aria-label={en ? 'Language' : 'Sprache'}>
+        {
+          (['de', 'en'] as const).map((locale, index) => (
+            <span>
+              {index > 0 && <span>/</span>}
+              <a
+                class={buttonClass({ variant: 'ghost', size: 'sm' }, locale === language ? 'language-active' : '')}
+                aria-label={locale === 'de' ? 'Deutsch' : 'English'}
+                href={switchHref(locale)}
+                hreflang={locale}
+                data-legal-switch={legal ? locale : undefined}
+              >
+                {locale.toUpperCase()}
+              </a>
+            </span>
+          ))
+        }
+      </div>
+      <button
+        type="button"
+        class={buttonClass({ variant: 'ghost', size: 'icon' }, 'mobile-menu-button')}
+        aria-expanded="false"
+        aria-controls={menuId}
+        aria-label={en ? 'Open menu' : 'Menü öffnen'}
+        data-menu-toggle
+        data-label-open={en ? 'Open menu' : 'Menü öffnen'}
+        data-label-close={en ? 'Close menu' : 'Menü schließen'}
+      >
+        <span data-icon-open><Icon name="menu" /></span>
+        <span data-icon-close hidden><Icon name="x" /></span>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav" id={menuId} aria-label={en ? 'Mobile navigation' : 'Mobile Navigation'} hidden>
+    {
+      navigationPages.map((target, index) => (
+        <a href={languagePages[language][target]}>
+          {t.nav[index]}
+          <Icon name="arrow-up-right" size={16} />
+        </a>
+      ))
+    }
+  </nav>
+</header>

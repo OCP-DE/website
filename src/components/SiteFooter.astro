@@ -1,0 +1,48 @@
+---
+import { content, type Language } from '../data/site-content';
+import { languagePages } from '../lib/site-routes';
+import { footerLogo } from '../lib/brand-logo';
+
+interface Props {
+  language: Language;
+}
+const { language } = Astro.props;
+const t = content[language];
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="site-container">
+    <div class="footer-top">
+      <a href={languagePages[language].home} class="footer-brand">
+        <img
+          src={footerLogo.src}
+          srcset={footerLogo.srcset}
+          sizes={footerLogo.sizes}
+          alt="Ocean Capital Partners"
+          width={footerLogo.width}
+          height={footerLogo.height}
+          loading="eager"
+          decoding="async"
+        />
+      </a>
+      <p>{t.footer}</p>
+      {
+        t.draft.trim() ? (
+          <span class="draft-label">
+            <span class="status-dot" />
+            {t.draft}
+          </span>
+        ) : (
+          <span aria-hidden="true" />
+        )
+      }
+    </div>
+    <div class="footer-bottom">
+      <span>© {year} Ocean Capital Partners GmbH</span>
+      <a href="/impressum" class="footer-legal-link">{t.imprintLink}</a>
+      <a href="/datenschutz" class="footer-legal-link">{t.privacyLink}</a>
+      {t.note.trim() ? <span class="footer-note">{t.note}</span> : null}
+    </div>
+  </div>
+</footer>

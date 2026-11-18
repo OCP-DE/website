@@ -1,0 +1,24 @@
+---
+import Paragraphs from './Paragraphs.astro';
+import { content, type Language } from '../../data/site-content';
+
+interface Props {
+  language: Language;
+}
+const t = content[Astro.props.language];
+const areas = t.focusAreas as string[][];
+---
+
+<div class="principles-grid focus-grid">
+  {
+    areas.map(([title, leitsatz, body], i) => (
+      <article class="principle" data-reveal style={`--reveal-delay:${i * 110}ms`}>
+        <h3>{title}</h3>
+        <p class="focus-leitsatz">{leitsatz}</p>
+        <div class="focus-body">
+          <Paragraphs text={body ?? ''} />
+        </div>
+      </article>
+    ))
+  }
+</div>

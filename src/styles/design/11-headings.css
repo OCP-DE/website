@@ -1,0 +1,63 @@
+/* 11 · One system for section headings: a small label with a fine line before it (as
+   "ÜBER OCEAN CAPITAL PARTNERS"), then the heading. The short navy bars above headings are
+   dropped; the focus page's capital chapter titles take exactly the label style.
+   Active while design.headings is true (src/data/design.ts). */
+html.d-headings {
+  /* Section labels one size everywhere (13 px) - on the hero photo as well as below it -
+     with one letter-spacing (the home hero used a slightly tighter one). */
+  .site-main .section-eyebrow {
+    font-size: 13px;
+  }
+  @media (min-width: 768px) {
+    .site-main .hero-content .section-eyebrow {
+      letter-spacing: 0.3em;
+    }
+  }
+  .site-main .chapter-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brand-grey, var(--muted-foreground));
+  }
+  .site-main .chapter-heading::before {
+    content: '';
+    height: 1px;
+    margin: 0;
+    background: rgb(10 28 68 / 35%);
+  }
+
+  /* One line before every label - on the hero photo and below it, on every page: the same
+     length and the same distance to the text (26 px / 16 px; phones 20 px / 12 px). */
+  .site-main :is(.section-eyebrow, .chapter-heading) {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 16px;
+  }
+  .site-main :is(.section-eyebrow, .chapter-heading)::before {
+    display: block;
+    flex: 0 0 26px;
+    width: 26px;
+  }
+  @media (max-width: 767px) {
+    .site-main :is(.section-eyebrow, .chapter-heading) {
+      gap: 12px;
+    }
+    .site-main .chapter-heading {
+      letter-spacing: 0;
+    }
+    .site-main :is(.section-eyebrow, .chapter-heading)::before {
+      flex-basis: 20px;
+      width: 20px;
+    }
+  }
+  .site-main .team-section-title::before,
+  .site-main .contact-section-title::before {
+    display: none;
+  }
+}

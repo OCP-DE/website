@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Privacy from '../components/legal/Privacy.astro';
+import { legalHead } from '../lib/seo';
+---
+
+<BaseLayout head={legalHead('datenschutz')} legal="datenschutz">
+  <Privacy slot="de" language="de" />
+  <Privacy slot="en" language="en" />
+</BaseLayout>

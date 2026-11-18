@@ -1,0 +1,72 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import Paragraphs from './Paragraphs.astro';
+import FocusAreas from './FocusAreas.astro';
+import { content, type Language } from '../../data/site-content';
+import { languagePages } from '../../lib/site-routes';
+import { buttonClass } from '../../lib/button';
+import { paragraphs } from '../../lib/text';
+import alster from '../../assets/hamburg-binnenalster.jpg';
+
+interface Props {
+  language: Language;
+}
+const { language } = Astro.props;
+const t = content[language];
+---
+
+<section class="ocean-hero">
+  <Image
+    class="hero-image"
+    src={alster}
+    alt={language === 'en' ? 'Sailboats on the Binnenalster, Hamburg' : 'Binnenalster mit Segelbooten, Hamburg'}
+    widths={[768, 1280, 1920]}
+    sizes="(max-width: 767px) 1100px, 100vw"
+    fetchpriority="high"
+    loading="eager"
+  />
+  <div class="hero-wash"></div>
+  <div class="site-container hero-content">
+    <div class="section-eyebrow">{t.eyebrow}</div>
+    <h1>OCEAN CAPITAL PARTNERS</h1>
+    <p class="hero-tagline">
+      {paragraphs(t.tagline).map((para) => <span class="tagline-line">{para}</span>)}
+    </p>
+    <a href={languagePages[language].focus} class={buttonClass({ size: 'lg' }, 'hero-cta')}>
+      {t.discover}<Icon name="arrow-up-right" />
+    </a>
+  </div>
+  <div class="hero-baseline site-container">
+    <span>OCEAN CAPITAL PARTNERS</span>
+    <a href="#ocean-about" aria-label={t.aboutLink}><Icon name="arrow-down" size={18} /></a>
+    <span>HAMBURG · ALSTER</span>
+  </div>
+</section>
+
+
+<section id="ocean-about" class="home-about site-container">
+  <div class="section-eyebrow">{t.aboutLabel}</div>
+  <div class="about-columns">
+    <h2 data-reveal>{t.aboutTitle}</h2>
+    <div data-reveal style="--reveal-delay:120ms">
+      <Paragraphs text={t.aboutText} />
+      <a href={languagePages[language].about} class={buttonClass({ variant: 'link' }, 'editorial-link')}>
+        {t.aboutLink}<Icon name="arrow-up-right" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="philosophy-band">
+  <div class="site-container">
+    <div class="section-eyebrow">{t.approachLabel}</div>
+    <div class="section-heading-row" data-reveal>
+      <h2>{t.approachTitle}</h2>
+      <a href={languagePages[language].focus} class={buttonClass({ variant: 'link' }, 'editorial-link')}>
+        {t.discover}<Icon name="arrow-up-right" />
+      </a>
+    </div>
+    <FocusAreas language={language} />
+  </div>
+</section>

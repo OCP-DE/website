@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { notFoundHead } from '../lib/seo';
+import { buttonClass } from '../lib/button';
+---
+
+<BaseLayout head={notFoundHead()}>
+  <section class="page-intro site-container">
+    <div class="section-eyebrow">404</div>
+    <h1>Seite nicht gefunden</h1>
+    <p class="page-lead">
+      Die aufgerufene Seite existiert nicht oder wurde verschoben.<br />
+      <span lang="en">The page you are looking for does not exist or has been moved.</span>
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="/" class={buttonClass()}>Zur Startseite</a>
+      <a href="/home" class={buttonClass({ variant: 'outline' })} lang="en">Go to Homepage</a>
+    </div>
+  </section>
+</BaseLayout>

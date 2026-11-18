@@ -1,0 +1,86 @@
+---
+import EmailLink from './EmailLink.astro';
+import { content, type Language } from '../../data/site-content';
+import { privacyContent, privacyDate } from '../../data/privacy-content';
+import { EMAIL, PHONE, PHONE_HREF } from '../../data/imprint-content';
+
+interface Props {
+  language: Language;
+}
+const { language } = Astro.props;
+const t = content[language];
+const privacy = privacyContent[language];
+
+// Paragraphs that are rendered as sub-headings inside a section.
+const subheadings = new Set([
+  'Art und Zweck der Verarbeitung', 'Rechtsgrundlage', 'Empfänger', 'Speicherdauer', 'Drittlandübermittlung',
+  'Bereitstellung', 'Löschen und Blockieren', 'Einzelfallbezogenes Widerspruchsrecht', 'Widerspruch gegen Direktwerbung',
+  'Empfänger eines Widerspruchs',
+  'Purpose of Processing', 'Legal Basis', 'Recipients', 'Retention Period', 'Transfers to Third Countries',
+  'Requirement to Provide Data', 'Managing Stored Data', 'Objection on Grounds Relating to Your Situation',
+  'Objection to Direct Marketing', 'How to Object',
+]);
+
+type Part = { kind: 'text'; value: string } | { kind: 'url'; value: string } | { kind: 'email'; before: string; after: string } | { kind: 'phone'; before: string; after: string };
+
+// Turn one line into text/link parts (bare URLs, the obfuscated email address, the phone number).
+function parts(line: string): Part[] {
+  const emailVariants = [EMAIL, 'kontakt@ocean-capital-partners.de'];
+  const email = emailVariants.find((variant) => line.includes(variant));
+  if (email) {
+    const [before = '', after = ''] = line.split(email);
+    return [{ kind: 'email', before, after }];
+  }
+  if (line.includes(PHONE)) {
+    const [before = '', after = ''] = line.split(PHONE);
+    return [{ kind: 'phone', before, after }];
+  }
+  return line
+    // URL ends before trailing punctuation or a closing bracket, e.g. "(https://example.org)."
+    .split(/(https?:\/\/[^\s,;()]+?)(?=[.,;)]*(?:\s|$))/g)
+    .filter(Boolean)
+    .map((value) => (/^https?:\/\//.test(value) ? { kind: 'url', value } : { kind: 'text', value }));
+}
+---
+
+<article class="legal-article">
+  <section class="page-intro site-container">
+    <div class="section-eyebrow">{t.impressumLabel}</div>
+    <h1>{privacy.title}</h1>
+    {privacy.intro && <p class="page-lead">{privacy.intro}</p>}
+  </section>
+  <section class="content-band site-container">
+    {
+      privacy.sections.map(([heading, body]) => (
+        <div class="legal-section legal-content">
+          <h2 class="mb-3 text-lg font-medium">{heading}</h2>
+          {body.split('\n\n').map((para) =>
+            subheadings.has(para) ? (
+              <h3 class="mt-5 mb-2 text-sm font-medium">{para}</h3>
+            ) : (
+              <p class="mb-3 whitespace-pre-line text-sm leading-7 text-muted-foreground">
+                {para.split('\n').map((line, j, lines) => (
+                  <span>
+                    {parts(line).map((part) =>
+                      part.kind === 'email' ? (
+                        <>{part.before}<EmailLink />{part.after}</>
+                      ) : part.kind === 'phone' ? (
+                        <>{part.before}<a href={`tel:${PHONE_HREF}`} class="legal-link">{PHONE}</a>{part.after}</>
+                      ) : part.kind === 'url' ? (
+                        <a href={part.value} target="_blank" rel="noopener noreferrer" class="legal-link">{part.value.replace(/^https?:\/\//, '')}</a>
+                      ) : (
+                        part.value
+                      ),
+                    )}
+                    {j < lines.length - 1 ? '\n' : ''}
+                  </span>
+                ))}
+              </p>
+            ),
+          )}
+        </div>
+      ))
+    }
+    <p class="text-sm text-muted-foreground">{privacyDate[language]}</p>
+  </section>
+</article>

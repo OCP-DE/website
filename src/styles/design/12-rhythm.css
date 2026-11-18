@@ -1,0 +1,55 @@
+/* 12 · One vertical rhythm: every content section has the same space above and below
+   (64 px desktop, 56 px tablet, 44 px phone); team groups use the same step.
+   Active while design.rhythm is true (src/data/design.ts). */
+html.d-rhythm {
+  & {
+    --rhythm: 64px;
+  }
+  @media (max-width: 1023px) {
+    & {
+      --rhythm: 56px;
+    }
+  }
+  @media (max-width: 767px) {
+    & {
+      --rhythm: 44px;
+    }
+  }
+
+  body .site-main.site-main .home-about,
+  body .site-main.site-main .philosophy-band,
+  body .site-main.site-main .compass-band,
+  body .site-main.site-main .statement-band,
+  body .site-main.site-main .capital-band,
+  body .site-main.site-main .chapter-section,
+  body .site-main.site-main .team-sections,
+  body .site-main.site-main .contact-intro,
+  body .site-main.site-main .contact-layout {
+    padding-top: var(--rhythm);
+    padding-bottom: var(--rhythm);
+  }
+  /* Pages without a photo (contact, legal): label and title start at exactly the same height
+     below the header as on the pages with a photo. */
+  body .site-main.site-main .page-intro {
+    padding-top: var(--site-opening-copy-top);
+  }
+  body .site-main.site-main .team-section + .team-section {
+    padding-top: var(--rhythm);
+  }
+  body .site-main.site-main .team-section .team-grid {
+    padding-bottom: 0;
+  }
+  body .site-main.site-main .team-section:not(:last-child) {
+    padding-bottom: var(--rhythm);
+  }
+  /* Contact, stacked columns (up to 1199 px): the same space above and below the dividing line
+     as between sections, on every device. */
+  @media (max-width: 1199px) {
+    body .site-main.site-main .contact-layout {
+      row-gap: var(--rhythm);
+    }
+    body .site-main.site-main .contact-form-column {
+      padding-top: var(--rhythm);
+    }
+  }
+}

@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import Paragraphs from './Paragraphs.astro';
+import { content, type Language } from '../../data/site-content';
+import { buttonClass } from '../../lib/button';
+import rene from '../../assets/team/rene-ufferhardt.png';
+import andre from '../../assets/team/andre-vollbrecht.png';
+import kettler from '../../assets/team/viktor-kettler.jpg';
+import lutz from '../../assets/team/lutz-wiemer.jpg';
+import guido from '../../assets/team/guido-zoeller.jpg';
+
+const portraits: Record<string, ImageMetadata> = {
+  'René Ufferhardt': rene,
+  'Dr. André Vollbrecht': andre,
+  'Dr. Andre Vollbrecht': andre,
+  'Viktor Kettler': kettler,
+  'Lutz Wiemer': lutz,
+  'Guido Zoeller': guido,
+};
+// Per-person crop transforms keep faces aligned in the square frame without editing the photos.
+const portraitCrops: Record<string, string> = {
+  'René Ufferhardt': 'portrait-rene',
+  'Dr. André Vollbrecht': 'portrait-andre',
+  'Dr. Andre Vollbrecht': 'portrait-andre',
+  'Viktor Kettler': 'portrait-kettler',
+  'Lutz Wiemer': 'portrait-lutz',
+  'Berthold Oster': 'portrait-oster',
+};
+
+interface Props {
+  language: Language;
+  name: string;
+  role: string;
+  biography: string;
+}
+const { language, name, role, biography } = Astro.props;
+const t = content[language];
+const portrait = portraits[name];
+---
+
+<article class="team-person">
+  {
+    portrait ? (
+      <div class="portrait-placeholder overflow-hidden p-0">
+        <Image
+          src={portrait}
+          alt={name}
+          widths={[320, 640]}
+          sizes="(max-width: 760px) 90vw, 320px"
+          class={`portrait-photo h-full w-full object-cover ${portraitCrops[name] ?? ''}`}
+          loading="lazy"
+        />
+      </div>
+    ) : (
+      <div class="portrait-placeholder">
+        <Icon name="user-round" size={48} strokeWidth={1} />
+        <span>{t.photo}</span>
+      </div>
+    )
+  }
+  <div class="team-info">
+    <h3>{name}</h3>
+    <span class="team-role">{role}</span>
+    <div class="team-bio" aria-hidden="true">
+      <div><Paragraphs text={biography} /></div>
+    </div>
+    <button
+      type="button"
+      class={buttonClass({ variant: 'ghost' }, 'team-toggle')}
+      aria-expanded="false"
+      data-team-toggle
+      data-more={t.more}
+      data-less={t.less}
+    >
+      <span data-label>{t.more}</span>
+      <Icon name="chevron-down" size={14} />
+    </button>
+  </div>
+</article>

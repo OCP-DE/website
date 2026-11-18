@@ -1,0 +1,219 @@
+/* 3 · Colours — white ground, black text, logo navy (#0A1C44) as the only colour.
+   Active while design.colours is true (src/data/design.ts). The logo is never recoloured. */
+html.d-colours {
+  & {
+    --brand-navy: #0a1c44;
+    --brand-black: #16181d;
+    --brand-grey: #5c6068;
+    --brand-grey-light: #8a8d94;
+    --brand-white: #ffffff;
+    --brand-paper: #ffffff;
+    --brand-band: #f2f2ef;
+    --brand-hairline: #dfdfdb;
+
+    /* Map the existing design tokens onto the reduced palette. */
+    --background: var(--brand-paper);
+    --foreground: var(--brand-black);
+    --card: var(--brand-white);
+    --card-foreground: var(--brand-black);
+    --popover: var(--brand-white);
+    --popover-foreground: var(--brand-black);
+    --primary: var(--brand-navy);
+    --primary-foreground: var(--brand-white);
+    --secondary: var(--brand-band);
+    --secondary-foreground: var(--brand-black);
+    --muted: var(--brand-band);
+    --muted-foreground: var(--brand-grey);
+    --accent: var(--brand-band);
+    --accent-foreground: var(--brand-black);
+    --border: var(--brand-hairline);
+    --input: #cfcfca;
+    --ring: var(--brand-navy);
+    --ocean-surface: var(--brand-band);
+    --ocean-line: var(--brand-hairline);
+    --ocean-accent: var(--brand-navy);
+    --ocean-accent-deep: var(--brand-navy);
+    --steel-sheen: none;
+    --site-chapter-surface: var(--brand-band);
+  }
+
+  body {
+    background: var(--brand-paper);
+  }
+  ::selection {
+    background: var(--brand-navy);
+    color: #fff;
+  }
+
+  /* ---------- Typography: original Manrope headings, recoloured only ---------- */
+  .site-main :is(h1, h2),
+  .site-main .team-info h3,
+  .site-main .principle h3,
+  .site-main .compass-card h3 .compass-heading-role,
+  .site-main .row-item dt,
+  .site-main .capital-title,
+  .statement-band .active-statement {
+    color: var(--brand-navy);
+  }
+  /* Headings on the hero photo stay white. */
+  .site-main .ocean-hero .hero-content h1,
+  .site-main .page-hero .page-hero-content h1 {
+    color: var(--hero-text);
+  }
+  .site-main .focus-grid .principle .focus-leitsatz {
+    color: var(--brand-black);
+  }
+  .site-main .compass-card h3 .compass-heading-lead {
+    color: var(--brand-grey);
+  }
+
+  /* Small labels: neutral grey (original letter-spacing kept). */
+  .section-eyebrow {
+    color: var(--brand-grey);
+  }
+  .section-eyebrow::before {
+    background: var(--brand-hairline);
+  }
+  .ocean-hero .section-eyebrow,
+  .page-hero .section-eyebrow {
+    color: rgb(255 255 255 / 85%);
+  }
+  .ocean-hero .section-eyebrow::before,
+  .page-hero .section-eyebrow::before {
+    background: rgb(255 255 255 / 55%);
+  }
+
+  /* ---------- Header ---------- */
+  .site-header {
+    background: var(--brand-white);
+    border-bottom-color: var(--brand-hairline);
+  }
+  .desktop-nav a {
+    color: var(--brand-grey);
+  }
+  .desktop-nav a:hover,
+  .nav-active {
+    color: var(--brand-navy);
+  }
+  .nav-active::after {
+    background: var(--brand-navy);
+  }
+  .language-switch .language-active {
+    color: var(--brand-navy);
+    text-decoration-color: var(--brand-navy);
+  }
+
+  /* ---------- Hero: original veil and colours are kept ---------- */
+  /* Main button in the logo navy. */
+  .hero-cta {
+    background: var(--brand-navy);
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 22%);
+    box-shadow: 0 14px 32px -20px rgb(0 0 0 / 55%);
+  }
+  .hero-cta:hover {
+    background: #142a5e;
+    color: #fff;
+    border-color: rgb(255 255 255 / 35%);
+  }
+
+  /* ---------- Sections: white, and a tint derived from the logo navy (about 3 %) ----------
+     The tint separates by tone alone - no extra rules on its edges. */
+  & {
+    --brand-tint: #f5f6f9;
+  }
+  .home-about,
+  .compass-band,
+  .capital-band,
+  .content-band,
+  .chapter-section {
+    background: var(--brand-white);
+    border-block: 0;
+  }
+  .philosophy-band,
+  .chapter-section-muted,
+  .statement-band {
+    background: var(--brand-tint);
+    border-block: 0;
+  }
+  .principle,
+  .principle:hover {
+    border-image: none;
+    border-top: 1px solid var(--brand-hairline);
+  }
+  .editorial-link {
+    color: var(--brand-navy);
+  }
+  .editorial-link:hover {
+    color: var(--brand-black);
+  }
+
+  /* ---------- Investment profile: same grid and rules as the rows above ---------- */
+  .criteria-table {
+    border-top: 1px solid var(--border);
+  }
+  .criteria-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 2fr;
+    gap: var(--site-column-gap);
+    align-items: baseline;
+    padding: var(--site-row-space) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .criteria-row:hover {
+    background: transparent;
+  }
+  .criteria-row span {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--brand-grey);
+  }
+  .criteria-row strong {
+    font-size: var(--site-item-size);
+    line-height: var(--site-heading-leading);
+    font-weight: 500;
+    color: var(--brand-navy);
+    text-align: left;
+    font-variant-numeric: lining-nums;
+  }
+  @media (max-width: 767px) {
+    .criteria-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+  }
+
+  /* ---------- Team ---------- */
+  .portrait-placeholder {
+    background: var(--brand-band);
+  }
+  .portrait-photo {
+    filter: saturate(0.85) brightness(1.02);
+  }
+  .team-role {
+    color: var(--brand-black);
+  }
+  .team-toggle {
+    color: var(--brand-navy);
+  }
+  .team-toggle:hover {
+    color: var(--brand-black);
+  }
+  .team-section-title::before,
+  .contact-section-title::before {
+    background: var(--brand-navy);
+  }
+
+  /* ---------- Footer: light, original logo ---------- */
+  .site-footer {
+    background: var(--brand-white);
+    border-top: 1px solid var(--brand-hairline);
+  }
+  .site-footer .footer-top p,
+  .site-footer .footer-bottom {
+    color: var(--brand-grey);
+  }
+  .site-footer .footer-legal-link {
+    color: var(--brand-black);
+  }
+}

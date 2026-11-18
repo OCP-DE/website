@@ -1,0 +1,139 @@
+---
+import Icon from '../Icon.astro';
+import { content, type Language } from '../../data/site-content';
+import { contactLogo } from '../../lib/brand-logo';
+import { companyEmailDisplay, companyEmailParts } from '../../lib/company-email';
+import { languagePages } from '../../lib/site-routes';
+import { buttonClass } from '../../lib/button';
+
+interface Props {
+  language: Language;
+}
+const { language } = Astro.props;
+const t = content[language];
+const [user, domain, tld] = companyEmailParts;
+const notice = (lang: Language) =>
+  `${content[lang].privacyNotice} ${content[lang].privacyNoticeLink}${lang === 'en' ? ' for details.' : '.'}`;
+
+// DE and EN text pairs: each block reserves the height of the longer language, so switching
+// languages does not shift the layout (ported from the previous site).
+const alignPairs: [string, string, string][] = [
+  ['.contact-intro h1', content.de.contactTitle, content.en.contactTitle],
+  ['.contact-intro .page-lead', content.de.contactText, content.en.contactText],
+  ['.contact-direct > h2', content.de.contactDirect, content.en.contactDirect],
+  ['.contact-direct dl > div:first-child dd', content.de.address, content.en.address],
+  ['.contact-form-column > h2', content.de.contactDetails, content.en.contactDetails],
+  ['.contact-form-intro', content.de.contactOr, content.en.contactOr],
+  ['.contact-confidential', content.de.confidentialNote, content.en.confidentialNote],
+  ['.contact-privacy', notice('de'), notice('en')],
+];
+---
+
+<div class="contact-page" data-contact-align={JSON.stringify(alignPairs)}>
+  <section class="page-intro contact-intro">
+    <div class="site-container">
+      <div class="section-eyebrow">{t.contactLabel}</div>
+      <h1>{t.contactTitle}</h1>
+      <p class="page-lead">{t.contactText}</p>
+    </div>
+  </section>
+  <section class="contact-layout site-container">
+    <div class="contact-direct">
+      <h2 class="contact-section-title">{t.contactDirect}</h2>
+      <div class="contact-visual contact-logo">
+        <img
+          src={contactLogo.src}
+          srcset={contactLogo.srcset}
+          sizes={contactLogo.sizes}
+          alt="Ocean Capital Partners"
+          width={contactLogo.width}
+          height={contactLogo.height}
+          decoding="async"
+        />
+      </div>
+      <div class="contact-details">
+        <dl class="mb-10 grid gap-4 text-sm leading-7">
+          <div>
+            <dt class="text-muted-foreground">{t.addressLabel}</dt>
+            <dd class="whitespace-pre-line">{t.address}</dd>
+          </div>
+          <div>
+            <dt class="text-muted-foreground">{t.phoneLabel}</dt>
+            <dd><a class="text-primary underline-offset-4 hover:underline" href={`tel:${t.phoneHref}`}>{t.phone}</a></dd>
+          </div>
+          <div>
+            <dt class="text-muted-foreground">{t.emailLabel}</dt>
+            <dd><span class="company-email-address">{companyEmailDisplay}</span></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    <div class="contact-details contact-form-column">
+      <h2 class="contact-section-title">{t.contactDetails}</h2>
+      <p class="contact-form-intro contact-text">{t.contactOr}</p>
+      <div class="contact-mail-row">
+        <a
+          href={languagePages[language].contact}
+          class={buttonClass({}, 'h-11 gap-6 rounded-sm px-6 shadow-none contact-mail-button')}
+          data-email-link
+          data-user={user}
+          data-domain={`${domain}.${tld}`}
+          data-subject={t.contactMailSubject}
+        >
+          {t.contactMailButton}<Icon name="arrow-right" />
+        </a>
+      </div>
+      <div class="contact-hints">
+        <p class="contact-confidential contact-text">{t.confidentialNote}</p>
+        <p class="contact-privacy contact-text">
+          {t.privacyNotice} <a href="/datenschutz" class="underline underline-offset-4">{t.privacyNoticeLink}</a>{
+            language === 'en' ? ' for details.' : '.'
+          }
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script is:inline>
+  // Runs right after the markup (before first paint): each text block reserves the height of
+  // its longer language, so switching DE/EN does not shift the layout. Re-run on resize/fonts.
+  (function () {
+    var root = document.querySelector("[data-contact-align]");
+    if (!root) return;
+    var pairs = JSON.parse(root.getAttribute("data-contact-align") || "[]");
+    function align() {
+      pairs.forEach(function (pair) {
+        var element = root.querySelector(pair[0]);
+        if (!element) return;
+        var width = element.getBoundingClientRect().width;
+        var probe = element.cloneNode(false);
+        Object.assign(probe.style, { position: "fixed", visibility: "hidden", pointerEvents: "none", width: width + "px", minHeight: "0", height: "auto", margin: "0" });
+        probe.setAttribute("aria-hidden", "true");
+        element.parentElement.appendChild(probe);
+        probe.textContent = pair[1];
+        var deHeight = probe.getBoundingClientRect().height;
+        probe.textContent = pair[2];
+        var enHeight = probe.getBoundingClientRect().height;
+        probe.remove();
+        element.style.minHeight = Math.max(deHeight, enHeight) + "px";
+      });
+      // The logo is height-aligned to the details; reserve its proportional width in the grid.
+      var details = root.querySelector(".contact-direct .contact-details");
+      var direct = root.querySelector(".contact-direct");
+      if (details && direct) {
+        var logoWidth = Math.ceil((Math.max(0, details.getBoundingClientRect().height - 12) * 1.061 * 941) / 1672);
+        direct.style.setProperty("--contact-logo-track", logoWidth + "px");
+      }
+    }
+    align();
+    var frame = 0;
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(function () {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(align);
+      }).observe(root);
+    }
+    if (document.fonts) document.fonts.ready.then(align);
+  })();
+</script>

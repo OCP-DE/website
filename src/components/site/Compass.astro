@@ -1,0 +1,57 @@
+---
+// Static compass: positioned by the dictionary's direction codes (N/O|E/S/W), not array order.
+import { content, type Language } from '../../data/site-content';
+
+interface Props {
+  language: Language;
+}
+const { language } = Astro.props;
+const entries = content[language].compass as string[][];
+const areas: Record<string, string> = { N: 'n', O: 'e', E: 'e', S: 's', W: 'w' };
+
+function splitHeading(lead: string, title: string) {
+  if (language === 'en') return { lead, role: title };
+  const heading = `${lead} ${title}`.replace(/\s+/g, ' ').trim();
+  const lastSpace = heading.lastIndexOf(' ');
+  return { lead: heading.slice(0, lastSpace), role: heading.slice(lastSpace + 1) };
+}
+const needle = `<circle cx="160" cy="160" r="150" class="needle-ring" />
+<path d="M160 22 L146 146 L160 160 Z M160 298 L174 174 L160 160 Z" class="needle-navy-face" />
+<path d="M160 22 L160 160 L174 146 Z M160 298 L160 160 L146 174 Z" class="needle-navy-fold" />
+<path d="M298 160 L174 146 L160 160 Z M22 160 L146 174 L160 160 Z" class="needle-grey-face" />
+<path d="M298 160 L160 160 L174 174 Z M22 160 L160 160 L146 146 Z" class="needle-grey-fold" />
+<circle cx="160" cy="160" r="2" class="needle-pivot-core" />`;
+---
+
+<div class="compass-mini">
+  {
+    entries.map(([direction = '', title = '', lead = '']) => (
+      <div class={`compass-mini-label compass-${areas[direction]}`}>
+        <span class="compass-mini-role">{splitHeading(lead, title).role}</span>
+      </div>
+    ))
+  }
+  <div class="compass-mini-needle">
+    <svg viewBox="0 0 320 320" class="compass-needle" aria-hidden="true" set:html={needle} />
+  </div>
+</div>
+<div class="compass-cross">
+  <div class="compass-center">
+    <svg viewBox="0 0 320 320" class="compass-needle" aria-hidden="true" set:html={needle} />
+  </div>
+  {
+    entries.map(([direction = '', title = '', lead = '', text = ''], i) => {
+      const heading = splitHeading(lead, title);
+      // Same gentle scroll reveal as the other texts on the site, slightly staggered.
+      return (
+        <article class={`compass-card compass-${areas[direction]}`} data-reveal style={`--reveal-delay:${i * 80}ms`}>
+          <h3>
+            <span class="compass-heading-lead">{heading.lead}</span>{' '}
+            <span class="compass-heading-role">{heading.role}</span>
+          </h3>
+          <p>{text.replace(/\s+/g, ' ').trim()}</p>
+        </article>
+      );
+    })
+  }
+</div>
