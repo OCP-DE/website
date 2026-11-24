@@ -1,0 +1,11 @@
+---
+import { paragraphs } from '../../lib/text';
+
+interface Props {
+  text: string;
+  class?: string;
+}
+const { text, class: className = '' } = Astro.props;
+---
+
+{paragraphs(text).map((para, i) => <p class={[className, i > 0 ? 'is-para' : ''].filter(Boolean).join(' ') || undefined}>{para}</p>)}

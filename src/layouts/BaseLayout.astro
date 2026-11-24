@@ -1,0 +1,271 @@
+---
+import '../styles.css';
+import '../styles/motion.css';
+// Design refresh: each point is switched on/off in src/data/design.ts.
+import '../styles/design/03-colours.css';
+import '../styles/design/07-team.css';
+import '../styles/design/09-footer.css';
+import '../styles/design/10-details.css';
+import '../styles/design/11-headings.css';
+import '../styles/design/12-rhythm.css';
+import '../styles/design/13-polish.css';
+import '../styles/print.css';
+import { getImage } from 'astro:assets';
+import { designClasses } from '../data/design';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { organizationData, siteName, type HeadData } from '../lib/seo';
+import { siteOrigin, type LegalPage, type SitePage } from '../lib/site-routes';
+import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+
+interface Props {
+  head: HeadData;
+  /** Content page key; omitted on legal and error pages. */
+  page?: SitePage;
+  /** Legal pages carry both languages and switch in place (no separate EN URL). */
+  legal?: LegalPage;
+}
+const { head, page, legal } = Astro.props;
+const language = head.language;
+const ogImage = new URL('/images/og-default.jpg', siteOrigin).href;
+const hasLanguageSlots = Astro.slots.has('de') && Astro.slots.has('en');
+// Structured data may carry a portrait (imported image); give search engines its web address.
+const jsonLd = await Promise.all(
+  head.jsonLd.map(async (data: Record<string, any>) => {
+    const image = data.image;
+    if (!image || typeof image !== 'object' || !('src' in image)) return data;
+    const optimized = await getImage({ src: image, width: 640, format: 'jpg' });
+    return { ...data, image: new URL(optimized.src, siteOrigin).href };
+  }),
+);
+---
+
+<!doctype html>
+<html lang={language} class={designClasses || undefined} data-page-lang={legal ? undefined : language}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{head.title}</title>
+    <meta name="description" content={head.description} />
+    {head.robots && <meta name="robots" content={head.robots} />}
+    <link rel="canonical" href={head.canonical} />
+    {head.alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={head.title} />
+    <meta property="og:description" content={head.ogDescription} />
+    <meta property="og:url" content={head.canonical} />
+    <meta property="og:locale" content={language === 'en' ? 'en_GB' : 'de_DE'} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Binnenalster, Hamburg – Ocean Capital Partners" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={head.title} />
+    <meta name="twitter:description" content={head.ogDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    {/* Always light: some phones would otherwise recolour the page in dark mode. */}
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#ffffff" />
+    {/* Other sites we link to learn only our domain, not the exact page. */}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    {/* Site icon: a pixel-exact 16 px icon for browser tabs; 192 px on white for search
+        results and home screens. */}
+    <link rel="icon" href="/ocp-tab.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=13" sizes="192x192" />
+    {/* Load the brand font with the page, so text does not re-flow when it arrives. */}
+    <link rel="preload" href={manropeLatin} as="font" type="font/woff2" crossorigin />
+    <script is:inline>
+      // After the first page of a visit, skip the hero entrance animation, so switching
+      // pages or languages feels calm instead of re-animating every time.
+      document.documentElement.classList.add('js');
+      try {
+        if (sessionStorage.getItem('ocean-visited')) document.documentElement.setAttribute('data-returning', '');
+        sessionStorage.setItem('ocean-visited', '1');
+      } catch (e) {}
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify(organizationData)} />
+    {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+    {
+      legal && (
+        <script is:inline>
+          // Choose the legal-page language before first paint: #english / #deutsch, then the
+          // language last used on a content page (sessionStorage), else German.
+          (function () {
+            var lang = 'de';
+            try {
+              if (sessionStorage.getItem('ocean-language') === 'en') lang = 'en';
+            } catch (e) {}
+            if (location.hash === '#english') lang = 'en';
+            if (location.hash === '#deutsch') lang = 'de';
+            document.documentElement.setAttribute('data-legal-lang', lang);
+            document.documentElement.lang = lang;
+          })();
+        </script>
+      )
+    }
+  </head>
+  <body>
+    {/* Keyboard and screen-reader users can jump straight past the navigation. */}
+    {
+      legal ? (
+        <>
+          <span data-lang="de"><a class="skip-link" href="#main">Zum Inhalt springen</a></span>
+          <span data-lang="en"><a class="skip-link" href="#main">Skip to content</a></span>
+        </>
+      ) : (
+        <a class="skip-link" href="#main">{language === 'en' ? 'Skip to content' : 'Zum Inhalt springen'}</a>
+      )
+    }
+    <div class="site-layout">
+      {
+        legal ? (
+          <>
+            <div data-lang="de">
+              <SiteHeader language="de" legal={legal} />
+            </div>
+            <div data-lang="en">
+              <SiteHeader language="en" legal={legal} />
+            </div>
+          </>
+        ) : (
+          <SiteHeader language={language} page={page} />
+        )
+      }
+      <main class="site-main" id="main">
+        {
+          hasLanguageSlots ? (
+            <>
+              <div data-lang="de" lang="de">
+                <slot name="de" />
+              </div>
+              <div data-lang="en" lang="en">
+                <slot name="en" />
+              </div>
+            </>
+          ) : (
+            <slot />
+          )
+        }
+      </main>
+      {
+        legal ? (
+          <>
+            <div data-lang="de">
+              <SiteFooter language="de" />
+            </div>
+            <div data-lang="en">
+              <SiteFooter language="en" />
+            </div>
+          </>
+        ) : (
+          <SiteFooter language={language} />
+        )
+      }
+    </div>
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* Always reserve the scrollbar's space, so short pages (e.g. contact on large screens)
+     don't shift the header and logo sideways compared with long pages. */
+  html {
+    scrollbar-gutter: stable;
+  }
+  /* Skip link: hidden until it receives keyboard focus. */
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    z-index: 100;
+    padding: 10px 16px;
+    background: #0a1c44;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus {
+    top: 12px;
+  }
+  /* The small footer logo gets a comfortable tap area without changing its look. */
+  .site-footer .footer-brand {
+    padding: 10px;
+    margin: -10px;
+  }
+  /* Smooth cross-fade between pages (and DE/EN) instead of a hard reload flash. Browsers
+     without support simply navigate normally. */
+  @view-transition {
+    navigation: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    @view-transition {
+      navigation: none;
+    }
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 180ms;
+  }
+  .site-header {
+    view-transition-name: site-header;
+  }
+  ::view-transition-old(site-header),
+  ::view-transition-new(site-header) {
+    animation: none;
+  }
+  html[data-returning] .hero-content {
+    animation: none !important;
+  }
+  /* Keep the footer at the bottom of the window on short pages (e.g. contact on large screens). */
+  .site-layout {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+  .site-layout > .site-main {
+    flex: 1 0 auto;
+  }
+  /* Contact: e-mail call to action (replaces the former form). Intro and hints share one text size. */
+  .contact-form-column .contact-text {
+    font-size: var(--site-body-size);
+    line-height: var(--site-body-leading);
+    color: var(--muted-foreground);
+    margin-bottom: 0;
+  }
+  .contact-form-column .contact-hints .contact-text {
+    margin: 0;
+  }
+  .contact-form-column .contact-mail-row {
+    margin-top: var(--site-content-space);
+    display: flex;
+  }
+  .contact-mail-row .contact-mail-button {
+    min-height: 48px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+  .contact-form-column .contact-hints {
+    margin-top: calc(var(--site-content-space) * 1.25);
+    display: grid;
+    gap: calc(var(--site-content-space) * 0.5);
+  }
+  @media (max-width: 520px) {
+    .contact-mail-row .contact-mail-button {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  [data-lang] {
+    display: contents;
+  }
+  html:not([data-legal-lang='en']) [data-lang='en'],
+  html[data-legal-lang='en'] [data-lang='de'] {
+    display: none;
+  }
+</style>

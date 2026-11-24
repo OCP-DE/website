@@ -1,0 +1,51 @@
+name: Security updates
+
+# Dependabot opens a pull request when a building block of the site has an update.
+# This workflow checks it (type check + full build) and, if everything passes, merges it
+# and publishes the site - no manual approval needed.
+# Only patch and minor updates are merged automatically. Major updates (which may change
+# behaviour) stay open as a pull request for review.
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  verify-and-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read update details
+        id: meta
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Merge and publish
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr merge --squash "$PR_URL"
+          # A merge made by this workflow does not trigger the deploy on its own.
+          gh workflow run deploy.yml --ref main

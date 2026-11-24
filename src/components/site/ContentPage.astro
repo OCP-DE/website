@@ -1,0 +1,155 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import Paragraphs from './Paragraphs.astro';
+import FocusAreas from './FocusAreas.astro';
+import Compass from './Compass.astro';
+import TeamCard from './TeamCard.astro';
+import { content, type Language } from '../../data/site-content';
+import { languagePages } from '../../lib/site-routes';
+import { buttonClass } from '../../lib/button';
+import alster from '../../assets/hamburg-binnenalster.jpg';
+
+interface Props {
+  language: Language;
+  kind: 'about' | 'focus' | 'team';
+}
+const { language, kind } = Astro.props;
+const t = content[language];
+const label = kind === 'about' ? t.aboutLabel : kind === 'focus' ? t.approachLabel : t.teamLabel;
+const title = kind === 'about' ? t.aboutTitle : kind === 'focus' ? t.approachTitle : t.teamTitle;
+const text = kind === 'about' ? t.aboutText : kind === 'focus' ? t.approachText : t.teamText;
+const contributions = t.contributions as string[][];
+const profile = t.profile as string[][];
+const teamGroups = [
+  { title: t.management, intro: '', people: t.managementPeople as string[][] },
+  { title: t.operativeTitle, intro: t.operativeText, people: [] as string[][] },
+  { title: t.advisory, intro: t.advisoryIntro, people: t.advisoryPeople as string[][] },
+];
+---
+
+<section class="page-hero">
+  <Image
+    class="hero-image"
+    src={alster}
+    alt="Binnenalster, Hamburg"
+    widths={[768, 1280, 1920]}
+    sizes="(max-width: 767px) 1100px, 100vw"
+    fetchpriority="high"
+    loading="eager"
+  />
+  <div class="hero-wash"></div>
+  <div class="site-container page-hero-content">
+    <div class="section-eyebrow">{label}</div>
+    <h1>{title}</h1>
+    <Paragraphs text={text} class="page-lead" />
+  </div>
+</section>
+
+{
+  kind === 'about' && (
+    <>
+      <section class="compass-band" aria-labelledby="compass-heading">
+        <div class="site-container">
+          <div class="section-eyebrow">{t.philosophyLabel}</div>
+          <h2 class="compass-heading" id="compass-heading">
+            {t.compassTitle}
+          </h2>
+          <p class="compass-intro">{t.compassIntro}</p>
+          <Compass language={language} />
+          <a href={languagePages[language].focus} class={buttonClass({ variant: 'link' }, 'editorial-link')}>
+            {t.discover}
+            <Icon name="arrow-up-right" />
+          </a>
+        </div>
+      </section>
+      <section class="statement-band">
+        <div class="site-container">
+          <p class="active-statement" data-reveal>{t.activeStatement}</p>
+        </div>
+      </section>
+      <section class="content-band capital-band">
+        <div class="site-container capital">
+          <div class="section-eyebrow">{t.capitalLabel}</div>
+          <div class="capital-grid" data-reveal>
+            <h2 class="capital-title">{t.capitalTitle}</h2>
+            <div>
+              <p class="capital-text">{t.capitalText}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+{
+  kind === 'focus' && (
+    <>
+      <section class="chapter-section" aria-labelledby="focus-chapter">
+        <div class="site-container">
+          <h2 class="chapter-heading" id="focus-chapter">
+            {t.focusLabel}
+          </h2>
+          <FocusAreas language={language} />
+        </div>
+      </section>
+      <section class="chapter-section chapter-section-muted" aria-labelledby="contribution-chapter">
+        <div class="site-container">
+          <h2 class="chapter-heading" id="contribution-chapter">
+            {t.contributionLabel}
+          </h2>
+          <dl class="row-list">
+            {contributions.map(([itemTitle = '', itemText = '']) => (
+              <div class="row-item" data-reveal>
+                <dt>{itemTitle}</dt>
+                <dd>{itemText}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+      <section id="criteria" class="chapter-section" aria-labelledby="profile-chapter">
+        <div class="site-container">
+          <h2 class="chapter-heading" id="profile-chapter">
+            {t.profileLabel}
+          </h2>
+          <div class="criteria-table" data-reveal>
+            {profile.map(([rowLabel, value]) => (
+              <div class="criteria-row">
+                <span>{rowLabel}</span>
+                <strong>{value}</strong>
+              </div>
+            ))}
+          </div>
+          <div class="next-page">
+            <a href={languagePages[language].team} class={buttonClass({ variant: 'outline', size: 'lg' })}>
+              {t.next}
+              <Icon name="arrow-up-right" />
+            </a>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+{
+  kind === 'team' && (
+    <div class="site-container team-sections">
+      {teamGroups.map((group) => (
+        <section class="team-section">
+          <h2 class="team-section-title">{group.title}</h2>
+          {group.intro && <p class="lead-text">{group.intro}</p>}
+          {group.people.length > 0 && (
+            <div class="team-grid" data-reveal>
+              {group.people.map(([name = '', role = '', biography = '']) => (
+                <TeamCard language={language} name={name} role={role} biography={biography} />
+              ))}
+            </div>
+          )}
+        </section>
+      ))}
+    </div>
+  )
+}

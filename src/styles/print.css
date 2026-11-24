@@ -1,0 +1,74 @@
+/* Print: a clean document - content in black on white, without navigation, buttons,
+   photos or motion. Useful in particular for the imprint and privacy notice. */
+@media print {
+  @page {
+    margin: 18mm 16mm;
+  }
+  html,
+  body,
+  .site-main section,
+  .site-main .site-container {
+    background: #fff !important;
+  }
+  .skip-link,
+  .desktop-nav,
+  .header-controls,
+  .mobile-nav,
+  .hero-image,
+  .hero-wash,
+  .hero-baseline,
+  .hero-cta,
+  .contact-mail-row,
+  .team-toggle,
+  .next-page,
+  .editorial-link,
+  .compass-needle,
+  .compass-mini,
+  .footer-legal-link {
+    display: none !important;
+  }
+  .ocean-hero,
+  .page-hero {
+    min-height: 0 !important;
+    height: auto !important;
+    background: none !important;
+  }
+  .hero-content,
+  .page-hero-content {
+    padding: 0 0 8mm !important;
+    text-shadow: none !important;
+  }
+  .site-main :is(h1, h2, h3, h4, p, li, dt, dd, span, strong, a, .section-eyebrow),
+  .site-footer,
+  .site-footer * {
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+  /* Content that fades or folds in on screen is fully shown on paper. */
+  [data-reveal],
+  .compass-card,
+  .compass-needle {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .team-bio {
+    grid-template-rows: 1fr !important;
+  }
+  .team-person,
+  .legal-section,
+  .criteria-row,
+  .row-item {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  /* External links in legal texts: print the address. */
+  .legal-article a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    word-break: break-all;
+  }
+}

@@ -1,0 +1,68 @@
+---
+import EmailLink from './EmailLink.astro';
+import { content, type Language } from '../../data/site-content';
+import { imprintText, PHONE, PHONE_HREF, WIKIMEDIA_URL, FLICKR_URL, LICENCE_URL } from '../../data/imprint-content';
+
+interface Props {
+  language: Language;
+}
+const { language } = Astro.props;
+const t = content[language];
+const i = imprintText[language];
+const short = (url: string) => url.replace(/^https:\/\//, '');
+---
+
+<article class="legal-article">
+  <section class="page-intro site-container">
+    <div class="section-eyebrow">{t.impressumLabel}</div>
+    <h1>{i.title}</h1>
+    <p class="page-lead">{i.lead}</p>
+  </section>
+  <section class="content-band site-container">
+    <div class="legal-content">
+      <section class="legal-section">
+        <h2>{i.provider}</h2>
+        <p>{i.providerBody.map((line) => <span>{line}<br /></span>)}</p>
+      </section>
+      <section class="legal-section">
+        <h2>{i.contact}</h2>
+        <p>{i.phoneLabel}: <a href={`tel:${PHONE_HREF}`}>{PHONE}</a></p>
+        <p>{i.emailLabel}: <EmailLink /></p>
+      </section>
+      <section class="legal-section">
+        <h2>{i.register}</h2>
+        <p>{i.registerBody.map((line) => <span>{line}<br /></span>)}</p>
+      </section>
+      <section class="legal-section">
+        <h2>{i.website}</h2>
+        <p>{i.websiteBody}</p>
+      </section>
+      <section class="legal-section">
+        <h2>{i.copyright}</h2>
+        <p>{i.copyrightBody}</p>
+      </section>
+      <section
+        id={language === 'de' ? 'bildnachweis' : 'bildnachweis-en'}
+        data-anchor="bildnachweis"
+        class="legal-section"
+      >
+        <h2>{i.credit}</h2>
+        <p>{i.creditIntro.map((line) => <span>{line}<br /></span>)}</p>
+        <p>
+          {i.sourceLabel}<a class="underline underline-offset-4" href={WIKIMEDIA_URL} target="_blank" rel="noreferrer"
+            >{short(WIKIMEDIA_URL)}</a
+          ><br />
+          {i.originalLabel}<a class="underline underline-offset-4" href={FLICKR_URL} target="_blank" rel="noreferrer"
+            >{short(FLICKR_URL)}</a
+          >
+        </p>
+        <p>
+          {i.licenceLabel}<a class="underline underline-offset-4" href={LICENCE_URL} target="_blank" rel="noreferrer"
+            >{short(LICENCE_URL)}</a
+          >
+        </p>
+        <p>{i.creditEdit}</p>
+      </section>
+    </div>
+  </section>
+</article>

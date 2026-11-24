@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Imprint from '../components/legal/Imprint.astro';
+import { legalHead } from '../lib/seo';
+---
+
+<BaseLayout head={legalHead('impressum')} legal="impressum">
+  <Imprint slot="de" language="de" />
+  <Imprint slot="en" language="en" />
+</BaseLayout>

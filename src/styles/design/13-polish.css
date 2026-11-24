@@ -1,0 +1,55 @@
+/* 13 · Polish — details one feels rather than sees. Nothing is added; what exists becomes
+   more precise. Active while design.polish is true (src/data/design.ts). */
+html.d-polish {
+  /* Type rendering: kerning and ligatures as the typeface intends. */
+  body {
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headings break into balanced lines - no single word left on its own line. */
+  .site-main :is(h1, h2, h3),
+  .statement-band .active-statement {
+    text-wrap: balance;
+  }
+
+  /* One tone for secondary text across page and footer. */
+  .site-footer {
+    --muted-foreground: #4f545d;
+  }
+
+  /* Text links inside running text: a fine, quiet underline that firms up on hover. */
+  .site-main p a,
+  .site-main dd a,
+  .legal-article a {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+    transition: text-decoration-color 0.3s ease;
+  }
+  .site-main p a:hover,
+  .site-main dd a:hover,
+  .legal-article a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* Portraits: a hairline edge so light backgrounds don't dissolve into the page. */
+  .portrait-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 1px rgb(10 28 68 / 8%);
+    pointer-events: none;
+  }
+
+  /* One rhythm for every interaction: same duration and easing everywhere. */
+  a,
+  button,
+  .principle,
+  .team-toggle svg,
+  .desktop-nav a::after {
+    transition-duration: 0.3s;
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+}

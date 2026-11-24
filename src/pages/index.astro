@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomePage from '../components/site/HomePage.astro';
+import { pageHead } from '../lib/seo';
+---
+
+<BaseLayout head={pageHead('home', 'de')} page="home">
+  <HomePage language="de" />
+</BaseLayout>

@@ -1,0 +1,14 @@
+---
+// Shows the obfuscated address; the browser script turns it into a working mailto link.
+// Without JavaScript the link falls back to the contact page.
+import { companyEmailDisplay, companyEmailParts } from '../../lib/company-email';
+
+interface Props {
+  trailing?: string;
+}
+const [user, domain, tld] = companyEmailParts;
+---
+
+<a href="/kontakt" class="legal-link" data-email-link data-user={user} data-domain={`${domain}.${tld}`}
+  >{companyEmailDisplay}{Astro.props.trailing}</a
+>

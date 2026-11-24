@@ -1,0 +1,31 @@
+---
+// E-mail disclaimer for signatures: /disclaimer, /disclaimer#deutsch, /disclaimer#english.
+// Not in the sitemap; noindex, follow, nosnippet.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { legalHead } from '../lib/seo';
+---
+
+<BaseLayout head={legalHead('disclaimer')} legal="disclaimer">
+<article class="legal-article">
+  <section id="deutsch" lang="de">
+   <div class="page-intro site-container"><h1>Hinweise zur E-Mail-Kommunikation</h1></div>
+   <div class="content-band site-container"><div class="legal-content">
+    <section class="legal-section"><h2>Vertrauliche Informationen</h2><p>Diese Hinweise gelten für E-Mails der Ocean Capital Partners GmbH und deren Anlagen. Die Nachrichten können vertrauliche Informationen enthalten und sind für die bezeichneten Empfänger bestimmt. Bei irrtümlichem Erhalt informieren Sie bitte den Absender und löschen Sie die Nachricht samt Anlagen und Kopien. Bitte verwenden oder verbreiten Sie den Inhalt nicht.</p></section>
+    <section class="legal-section"><h2>Beteiligungen und Transaktionen</h2><p>Soweit nicht ausdrücklich anders erklärt, dienen allgemeine Angaben zu möglichen Beteiligungen und Transaktionen ausschließlich der Information und Erörterung. Sie begründen weder ein verbindliches Angebot noch eine Finanzierungs- oder Beteiligungszusage. Konkrete Vorbehalte, etwa zu Due Diligence, erforderlichen Zustimmungen und Vertragsabschluss, ergeben sich aus der jeweiligen Erklärung oder Vereinbarung. Bereits getroffene Vereinbarungen bleiben unberührt.</p></section>
+    <section class="legal-section"><h2>Informationsgrundlagen und Beratung</h2><p>Vorläufige Angaben, Einschätzungen und Prognosen können sich ändern und ersetzen keine eigene Prüfung. Prognosen sind keine Zusicherung künftiger Ergebnisse. Die bloße Übermittlung von Informationen begründet keine Anlage-, Rechts-, Steuer- oder sonstige Beratungsbeziehung. Ausdrücklich vereinbarte Leistungen, Zusicherungen und gesetzliche Pflichten bleiben unberührt.</p></section>
+    <section class="legal-section"><h2>Elektronische Kommunikation</h2><p>E-Mails können Übertragungsfehler aufweisen oder von Dritten eingesehen und verändert werden. Für besonders vertrauliche Informationen vereinbaren wir auf Wunsch einen geeigneten Übermittlungsweg. Änderungen von Zahlungs- oder Bankverbindungsdaten sollten über einen bereits bekannten Kontaktweg bestätigt werden.</p></section>
+    <section class="legal-section"><h2>Datenschutz und rechtliche Einordnung</h2><p>Informationen zur Verarbeitung personenbezogener Daten finden Sie in unserer <a class="underline underline-offset-4" href="/datenschutz">Datenschutzerklärung</a>. Diese Hinweise ersetzen keine Vertraulichkeitsvereinbarung und beschränken keine zwingenden gesetzlichen Rechte oder Haftungsansprüche.</p></section>
+   </div></div>
+  </section>
+  <section id="english" lang="en">
+   <div class="page-intro site-container"><h2 class="legal-english-title">Email Communications</h2></div>
+   <div class="content-band site-container"><div class="legal-content">
+    <section class="legal-section"><h3>Confidential Information</h3><p>These notices apply to emails sent by Ocean Capital Partners GmbH and their attachments. Communications may contain confidential information and are intended for the named recipients. If you receive a message in error, please notify the sender and delete the message, its attachments and any copies. Please do not use or disclose the contents.</p></section>
+    <section class="legal-section"><h3>Investments and Transactions</h3><p>Unless expressly stated otherwise, general information on potential investments or transactions is provided for information and discussion only. It does not constitute a binding offer, financing commitment or investment commitment. Any specific conditions, including due diligence, required approvals and definitive agreements, are set out in the relevant communication or agreement. Existing agreements remain unaffected.</p></section>
+    <section class="legal-section"><h3>Information and Advice</h3><p>Preliminary information, assessments and forecasts are subject to change and do not replace independent review. Forecasts are not assurances of future performance. Providing information does not, in itself, establish an investment, legal, tax or other advisory relationship. Expressly agreed services and assurances, and statutory obligations, remain unaffected.</p></section>
+    <section class="legal-section"><h3>Electronic Communications</h3><p>Emails may be subject to transmission errors, interception or alteration. For particularly sensitive information, we can arrange an appropriate alternative means of communication. Changes to payment instructions or bank details should be verified through an established contact channel.</p></section>
+    <section class="legal-section"><h3>Privacy and Legal Effect</h3><p>Information about the processing of personal data is available in our <a class="underline underline-offset-4" href="/datenschutz">Privacy Notice</a>. These notices do not replace a confidentiality agreement or limit any mandatory statutory rights or liability.</p></section>
+   </div></div>
+  </section>
+</article>
+</BaseLayout>

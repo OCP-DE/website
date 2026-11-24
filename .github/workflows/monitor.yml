@@ -1,0 +1,84 @@
+name: Website monitor
+
+# Checks the live website every hour. If anything is wrong, this run fails and GitHub sends
+# an e-mail to the account that last changed this file (and to anyone watching the repo).
+# Checks:
+#  - the site and every page answer over HTTPS (certificate valid), with the security policy
+#  - www and http redirect permanently (301) to https://ocean-capital-partners.de
+#  - sitemap, robots.txt and security.txt are reachable; security.txt has not expired
+#  - the last deploy succeeded
+#  - no automatic update is stuck: an update pull request open for more than 14 days means
+#    it could not be merged automatically (failed check or major update) and needs a look.
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  pull-requests: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      SITE: https://ocean-capital-partners.de
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Pages answer over HTTPS
+        run: |
+          fail=0
+          for p in / /ueber-uns /fokus /team /kontakt /home /about /focus /our-team /contact /impressum /datenschutz /sitemap.xml /robots.txt /.well-known/security.txt; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 3 --retry-delay 20 --max-time 30 "$SITE$p" || echo 000)
+            echo "$code $p"
+            [ "$code" = 200 ] || fail=1
+          done
+          curl -s --max-time 30 "$SITE/" | grep -q 'http-equiv="Content-Security-Policy"' || { echo "Security policy missing on the home page"; fail=1; }
+          exit $fail
+
+      - name: Redirects are permanent
+        run: |
+          fail=0
+          for u in https://www.ocean-capital-partners.de/ http://ocean-capital-partners.de/; do
+            out=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --retry 3 --max-time 30 "$u" || true)
+            code=${out%% *}; loc=${out#* }
+            echo "$code $u -> $loc"
+            if [ "$code" != 301 ] || [ "$loc" != "$SITE/" ]; then fail=1; fi
+          done
+          exit $fail
+
+      - name: security.txt still valid
+        run: |
+          exp=$(curl -s --max-time 30 "$SITE/.well-known/security.txt" | sed -n 's/^Expires: //p')
+          echo "Expires: $exp"
+          [ -n "$exp" ] && [ "$(date -u -d "$exp" +%s)" -gt "$(date -u +%s)" ]
+
+      - name: Last deploy succeeded
+        run: |
+          result=$(gh run list -R "$REPO" --workflow deploy.yml --limit 1 --json status,conclusion -q '.[0] | "\(.status) \(.conclusion)"')
+          echo "Last deploy: $result"
+          case "$result" in "completed success"|"in_progress "*|"queued "*) ;; *) exit 1 ;; esac
+
+      - name: No update stuck
+        run: |
+          stuck=$(gh pr list -R "$REPO" --author 'app/dependabot' --state open --json number,title,createdAt \
+            -q '[.[] | select((now - (.createdAt | fromdateiso8601)) > 1209600)] | .[] | "#\(.number) \(.title)"')
+          if [ -n "$stuck" ]; then
+            echo "Update pull requests open for more than 14 days (need a manual look):"
+            echo "$stuck"
+            exit 1
+          fi
+          echo "No stuck updates."
+
+      - name: Tidy the run history
+        # Keeps the public Actions list short: successful hourly checks older than a day and
+        # successful runs of earlier versions are removed. Failed runs stay visible.
+        run: |
+          cutoff=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
+          head=$(gh api "repos/$REPO/commits/main" -q .sha)
+          gh api --paginate "repos/$REPO/actions/runs?status=success&per_page=100" \
+            -q ".workflow_runs[] | select(.created_at < \"$cutoff\" and (.event == \"schedule\" or .head_sha != \"$head\")) | .id" |
+            while read -r id; do gh api -X DELETE "repos/$REPO/actions/runs/$id" >/dev/null || true; done
